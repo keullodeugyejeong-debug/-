@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>세이프메시 — 최종 아이콘 (Mesh S)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #f0f1f4; font-family: 'IBM Plex Sans KR', sans-serif; padding: 48px 24px 80px; color: #1a1a1a; -webkit-font-smoothing: antialiased; }
+  .head { max-width: 900px; margin: 0 auto 44px; text-align: center; }
+  .head h1 { font-family: 'Archivo', sans-serif; font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; letter-spacing: -0.02em; }
+  .head p { color: #666; font-size: 0.98rem; line-height: 1.6; }
+
+  .wrap { max-width: 900px; margin: 0 auto; }
+  .block { background: #fff; border-radius: 20px; padding: 36px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 28px; }
+  .block-t { font-family: 'Archivo', sans-serif; font-size: 1.15rem; font-weight: 700; margin-bottom: 6px; }
+  .block-d { font-size: 0.85rem; color: #777; margin-bottom: 28px; }
+
+  /* phone icon sizes */
+  .size-line { display: flex; align-items: flex-end; gap: 32px; flex-wrap: wrap; }
+  .size-item { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .ic { overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+  .ic svg { width: 100%; height: 100%; display: block; }
+  .ic.s180 { width: 120px; height: 120px; border-radius: 27px; }
+  .ic.s120 { width: 90px; height: 90px; border-radius: 20px; }
+  .ic.s80 { width: 60px; height: 60px; border-radius: 14px; }
+  .ic.s60 { width: 44px; height: 44px; border-radius: 10px; }
+  .ic.s40 { width: 30px; height: 30px; border-radius: 7px; }
+  .size-cap { font-family: 'IBM Plex Mono', monospace; font-size: 0.66rem; color: #999; font-weight: 600; }
+  .size-cap b { color: #555; display: block; font-size: 0.72rem; }
+
+  /* watch sizes - circular */
+  .watch-line { display: flex; align-items: center; gap: 40px; flex-wrap: wrap; }
+  .ic-round { overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.12); border-radius: 50%; }
+  .ic-round svg { width: 100%; height: 100%; display: block; }
+  .ic-round.w100 { width: 100px; height: 100px; }
+  .ic-round.w60 { width: 60px; height: 60px; }
+  .ic-round.w48 { width: 48px; height: 48px; }
+
+  /* watch face mockup */
+  .watch-face { width: 150px; height: 180px; position: relative; }
+  .watch-body { position: absolute; top: 18px; left: 15px; width: 120px; height: 144px; background: #1a1a1d; border-radius: 36px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
+  .watch-band { position: absolute; left: 48px; width: 54px; height: 28px; background: #2a2a2e; }
+  .watch-band.top { top: 0; border-radius: 8px 8px 0 0; }
+  .watch-band.bot { bottom: 0; border-radius: 0 0 8px 8px; }
+  .watch-app { width: 56px; height: 56px; border-radius: 50%; overflow: hidden; }
+  .watch-app svg { width: 100%; height: 100%; display: block; }
+  .watch-cap { text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 0.66rem; color: #999; margin-top: 8px; font-weight: 600; }
+
+  /* homescreen */
+  .home-preview { background: linear-gradient(160deg, #4a5568, #2d3748); border-radius: 18px; padding: 22px; display: flex; gap: 18px; align-items: flex-start; flex-wrap: wrap; }
+  .hp-app { display: flex; flex-direction: column; align-items: center; gap: 7px; width: 64px; }
+  .hp-icon { width: 56px; height: 56px; border-radius: 14px; overflow: hidden; box-shadow: 0 3px 8px rgba(0,0,0,0.3); }
+  .hp-icon svg { width: 100%; height: 100%; display: block; }
+  .hp-name { font-size: 0.62rem; color: #fff; text-align: center; font-weight: 500; }
+  .hp-other { width: 56px; height: 56px; border-radius: 14px; background: rgba(255,255,255,0.12); }
+
+  .variants { display: flex; gap: 20px; flex-wrap: wrap; }
+  .var-item { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .var-cap { font-size: 0.72rem; color: #888; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="head">
+  <h1>세이프메시 — 최종 아이콘</h1>
+  <p>Mesh "S" 디자인에서 검은 점 두 개를 뺐어. 이제 오렌지 노드만 남아 더 깔끔해.<br>폰·워치용 사이즈와 홈화면 미리보기를 함께 넣었어.</p>
+</div>
+
+<div class="wrap">
+
+  <!-- main icon + phone sizes -->
+  <div class="block">
+    <div class="block-t">📱 폰 앱 아이콘 — 사이즈별</div>
+    <div class="block-d">iOS·안드로이드에서 쓰이는 주요 사이즈야. 작아져도 S 곡선과 양 끝 노드가 또렷하게 보여.</div>
+    <div class="size-line">
+      <div class="size-item">
+        <div class="ic s180">
+          <svg viewBox="0 0 100 100">
+            <defs><linearGradient id="m1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff6a2b"/><stop offset="1" stop-color="#ff4d00"/></linearGradient></defs>
+            <rect width="100" height="100" fill="#fff"/>
+            <path d="M66 36 C66 28 58 26 50 26 C42 26 34 29 34 37 C34 52 66 48 66 63 C66 71 58 74 50 74 C42 74 34 72 34 64" fill="none" stroke="url(#m1)" stroke-width="6" stroke-linecap="round"/>
+            <circle cx="66" cy="36" r="7.5" fill="url(#m1)"/>
+            <circle cx="34" cy="64" r="7.5" fill="url(#m1)"/>
+          </svg>
+        </div>
+        <div class="size-cap"><b>180px</b>App Store</div>
+      </div>
+      <div class="size-item">
+        <div class="ic s120"><svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#fff"/><path d="M66 36 C66 28 58 26 50 26 C42 26 34 29 34 37 C34 52 66 48 66 63 C66 71 58 74 50 74 C42 74 34 72 34 64" fill="none" stroke="url(#m1)" stroke-width="6" stroke-linecap="round"/><circle cx="66" cy="36" r="7.5" fill="url(#m1)"/><circle cx="34" cy="64" r="7.5" fill="url(#m1)"/></svg></div>
+        <div class="size-cap"><b>120px</b>홈화면</div>
+      </div>
+      <div class="size-item">
+        <div class="ic s80"><svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#fff"/><path d="M66 36 C66 28 58 26 50 26 C42 26 34 29 34 37 C34 52 66 48 66 63 C66 71 58 74 50 74 C42 74 34 72 34 64" fill="none" stroke="url(#m1)" stroke-width="6.5" stroke-linecap="round"/><circle cx="66" cy="36" r="8" fill="url(#m1)"/><circle cx="34" cy="64" r="8" fill="url(#m1)"/></svg></div>
+        <div class="size-cap"><b>80px</b>스포트라이트</div>
+      </div>
+      <div class="size-item">
+        <div class="ic s60"><svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#fff"/><path d="M66 36 C66 28 58 26 50 26 C42 26 34 29 34 37 C34 52 66 48 66 63 C66 71 58 74 50 74 C42 74 34 72 34 64" fill="none" stroke="url(#m1)" stroke-width="7" stroke-linecap="round"/><circle cx="66" cy="36" r="8.5" fill="url(#m1)"/><circle cx="34" cy="64" r="8.5" fill="url(#m1)"/></svg></div>
+        <div class="size-cap"><b>60px</b>설정</div>
+      </div>
+      <div class="size-item">
+        <div class="ic s40"><svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#fff"/><path d="M65 37 C65 30 58 27 50 27 C42 27 35 30 35 38 C35 51 65 48 65 62 C65 70 58 73 50 73 C42 73 35 70 35 63" fill="none" stroke="url(#m1)" stroke-width="8" stroke-linecap="round"/><circle cx="65" cy="37" r="9.5" fill="url(#m1)"/><circle cx="35" cy="63" r="9.5" fill="url(#m1)"/></svg></div>
+        <div class="size-cap"><b>40px</b>알림</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- watch sizes -->
+  <div class="block">
+    <div class="block-t">⌚ 워치 앱 아이콘 — 원형</div>
+    <div class="block-d">애플워치·갤럭시워치는 아이콘이 원형이야. 작은 화면에서도 보이도록 S와 노드를 살짝 키웠어.</div>
+    <div class="watch-line">
+      <div class="watch-face">
+        <div class="watch-band top"></div>
+        <div class="watch-band bot"></div>
+        <div class="watch-body">
+          <div class="watch-app">
+            <svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#fff"/><path d="M65 37 C65 30 58 27 50 27 C42 27 35 30 35 38 C35 51 65 48 65 62 C65 70 58 73 50 73 C42 73 35 70 35 63" fill="none" stroke="url(#m1)" stroke-width="8" stroke-linecap="round"/><circle cx="65" cy="37" r="9.5" fill="url(#m1)"/><circle cx="35" cy="63" r="9.5" fill="url(#m1)"/></svg>
+          </div>
+        </div>
+        <div class="watch-cap">워치 화면</div>
+      </div>
+      <div class="size-item">
+        <div class="ic-round w100"><svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#fff"/><path d="M65 37 C65 30 58 27 50 27 C42 27 35 30 35 38 C35 51 65 48 65 62 C65 70 58 73 50 73 C42 73 35 70 35 63" fill="none" stroke="url(#m1)" stroke-width="8" stroke-linecap="round"/><circle cx="65" cy="37" r="9.5" fill="url(#m1)"/><circle cx="35" cy="63" r="9.5" fill="url(#m1)"/></svg></div>
+        <div class="size-cap"><b>100px</b>워치 홈</div>
+      </div>
+      <div class="size-item">
+        <div class="ic-round w60"><svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#fff"/><path d="M65 37 C65 30 58 27 50 27 C42 27 35 30 35 38 C35 51 65 48 65 62 C65 70 58 73 50 73 C42 73 35 70 35 63" fill="none" stroke="url(#m1)" stroke-width="8.5" stroke-linecap="round"/><circle cx="65" cy="37" r="10" fill="url(#m1)"/><circle cx="35" cy="63" r="10" fill="url(#m1)"/></svg></div>
+        <div class="size-cap"><b>60px</b>알림</div>
+      </div>
+      <div class="size-item">
+        <div class="ic-round w48"><svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#fff"/><path d="M64 38 C64 31 58 28 50 28 C42 28 36 31 36 39 C36 51 64 48 64 61 C64 69 58 72 50 72 C42 72 36 69 36 62" fill="none" stroke="url(#m1)" stroke-width="9" stroke-linecap="round"/><circle cx="64" cy="38" r="11" fill="url(#m1)"/><circle cx="36" cy="62" r="11" fill="url(#m1)"/></svg></div>
+        <div class="size-cap"><b>48px</b>콤플리케이션</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- color variants -->
+  <div class="block">
+    <div class="block-t">🎨 배경 변형</div>
+    <div class="block-d">흰 배경이 기본이야. 다크 모드나 강조용으로 오렌지·다크 배경 버전도 준비했어.</div>
+    <div class="variants">
+      <div class="var-item">
+        <div class="ic s120"><svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#fff"/><path d="M66 36 C66 28 58 26 50 26 C42 26 34 29 34 37 C34 52 66 48 66 63 C66 71 58 74 50 74 C42 74 34 72 34 64" fill="none" stroke="url(#m1)" stroke-width="6" stroke-linecap="round"/><circle cx="66" cy="36" r="7.5" fill="url(#m1)"/><circle cx="34" cy="64" r="7.5" fill="url(#m1)"/></svg></div>
+        <div class="var-cap">화이트 (기본)</div>
+      </div>
+      <div class="var-item">
+        <div class="ic s120"><svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#ff4d00"/><path d="M66 36 C66 28 58 26 50 26 C42 26 34 29 34 37 C34 52 66 48 66 63 C66 71 58 74 50 74 C42 74 34 72 34 64" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/><circle cx="66" cy="36" r="7.5" fill="#fff"/><circle cx="34" cy="64" r="7.5" fill="#fff"/></svg></div>
+        <div class="var-cap">오렌지</div>
+      </div>
+      <div class="var-item">
+        <div class="ic s120"><svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#1a1a1d"/><path d="M66 36 C66 28 58 26 50 26 C42 26 34 29 34 37 C34 52 66 48 66 63 C66 71 58 74 50 74 C42 74 34 72 34 64" fill="none" stroke="url(#m1)" stroke-width="6" stroke-linecap="round"/><circle cx="66" cy="36" r="7.5" fill="url(#m1)"/><circle cx="34" cy="64" r="7.5" fill="url(#m1)"/></svg></div>
+        <div class="var-cap">다크</div>
+      </div>
+      <div class="var-item">
+        <div class="ic s120"><svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#0a2540"/><path d="M66 36 C66 28 58 26 50 26 C42 26 34 29 34 37 C34 52 66 48 66 63 C66 71 58 74 50 74 C42 74 34 72 34 64" fill="none" stroke="url(#m1)" stroke-width="6" stroke-linecap="round"/><circle cx="66" cy="36" r="7.5" fill="url(#m1)"/><circle cx="34" cy="64" r="7.5" fill="url(#m1)"/></svg></div>
+        <div class="var-cap">네이비</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- homescreen -->
+  <div class="block">
+    <div class="block-t">홈화면 미리보기</div>
+    <div class="block-d">실제 폰 홈화면에 놓였을 때.</div>
+    <div class="home-preview">
+      <div class="hp-app">
+        <div class="hp-icon"><svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#fff"/><path d="M66 36 C66 28 58 26 50 26 C42 26 34 29 34 37 C34 52 66 48 66 63 C66 71 58 74 50 74 C42 74 34 72 34 64" fill="none" stroke="url(#m1)" stroke-width="6" stroke-linecap="round"/><circle cx="66" cy="36" r="7.5" fill="url(#m1)"/><circle cx="34" cy="64" r="7.5" fill="url(#m1)"/></svg></div>
+        <div class="hp-name">세이프메시</div>
+      </div>
+      <div class="hp-other"></div><div class="hp-other"></div><div class="hp-other"></div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

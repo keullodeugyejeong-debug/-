@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>세이프메시 — Rescue Routing (건축 평면도)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #f7f8fa; --surface: #ffffff; --surface-2: #f1f3f6;
+    --line: #e8eaee; --line-2: #dfe2e7;
+    --orange: #ff6a1f; --orange-deep: #ff4d00; --orange-soft: #fff1ec;
+    --green: #16a34a;
+    --blue: #2563eb;
+    --red: #ff1f1f;
+    --text: #15171c; --text-dim: #6b7280; --text-dimmer: #9ca3af;
+    /* floor plan colors */
+    --fp-paper: #fcfbf7;
+    --fp-wall: #2b2b2e;
+    --fp-room: #f3f1ea;
+    --fp-room2: #eeebe1;
+    --fp-corridor: #e4f0f4;
+    --fp-ink: #8a8578;
+    --fp-dim: #c8c3b4;
+    --route-done: #c4b0a0;
+    --route-live: #ff4d00;
+  }
+  body { background: #e8eaed; font-family: 'IBM Plex Sans KR', sans-serif; padding: 40px 20px 80px; -webkit-font-smoothing: antialiased; color: #1a1a1a; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; } }
+
+  .page-head { max-width: 1100px; margin: 0 auto 28px; text-align: center; }
+  .page-head h1 { font-family: 'Archivo', sans-serif; font-size: 1.7rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.02em; }
+  .page-head h1 .accent { color: var(--orange-deep); }
+  .page-head p { color: #666; font-size: 0.95rem; line-height: 1.6; }
+
+  .controls { max-width: 1100px; margin: 0 auto 24px; display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; }
+  .ctrl-btn { background: var(--orange-deep); color: #fff; border: none; border-radius: 100px; padding: 11px 22px; font-family: 'IBM Plex Sans KR'; font-size: 0.9rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(255,77,0,0.3); transition: transform 0.1s; }
+  .ctrl-btn:active { transform: scale(0.96); }
+  .ctrl-btn.sec { background: #fff; color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  .ctrl-hint { font-size: 0.82rem; color: #888; }
+
+  .stage { display: flex; flex-wrap: wrap; gap: 48px; justify-content: center; align-items: flex-start; max-width: 1100px; margin: 0 auto; }
+  .device-col { display: flex; flex-direction: column; align-items: center; }
+  .device-cap { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; font-weight: 600; color: #888; letter-spacing: 0.08em; margin-bottom: 14px; text-transform: uppercase; }
+
+  .phone { width: 348px; height: 752px; border-radius: 46px; position: relative; background: #000; box-shadow: 0 24px 60px rgba(0,0,0,0.28), 0 0 0 11px #1a1a1d, 0 0 0 12px #36363a; overflow: hidden; }
+  .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 130px; height: 27px; background: #1a1a1d; border-radius: 0 0 18px 18px; z-index: 100; }
+  .screen { position: absolute; inset: 0; background: var(--fp-paper); overflow: hidden; display: flex; flex-direction: column; }
+  .statusbar { height: 44px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 6px 24px 0; color: var(--text); font-size: 0.74rem; font-weight: 600; z-index: 50; position: relative; background: rgba(255,255,255,0.6); }
+  .statusbar .icons { letter-spacing: 1.5px; font-size: 0.66rem; }
+
+  .nav-bar { position: absolute; top: 50px; left: 12px; right: 12px; z-index: 40; background: var(--orange-deep); border-radius: 18px; padding: 14px 16px; display: flex; align-items: center; gap: 14px; box-shadow: 0 6px 20px rgba(255,77,0,0.35); }
+  .nav-bar .nb-arrow { width: 46px; height: 46px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #fff; }
+  .nav-bar .nb-arrow .big { font-size: 2rem; font-family: 'Archivo'; font-weight: 900; }
+  .nav-bar .nb-txt { flex: 1; color: #fff; }
+  .nav-bar .nb-dist { font-family: 'Archivo'; font-size: 1.5rem; font-weight: 800; line-height: 1; }
+  .nav-bar .nb-dist .u { font-size: 0.9rem; font-weight: 700; }
+  .nav-bar .nb-inst { font-size: 0.8rem; opacity: 0.95; margin-top: 3px; }
+
+  .map-vp { flex: 1; position: relative; overflow: hidden; background: var(--fp-paper); }
+  .map-canvas { position: absolute; top: 0; left: 0; width: 1400px; height: 1400px; will-change: transform; }
+  .map-canvas svg { display: block; width: 1400px; height: 1400px; }
+
+  .user-marker { position: absolute; left: 50%; top: 58%; z-index: 30; pointer-events: none; }
+  .user-marker .um-cone { position: absolute; left: 50%; top: 50%; width: 86px; height: 86px; margin-left: -43px; margin-top: -43px; background: conic-gradient(from -30deg at 50% 50%, transparent 0deg, rgba(37,99,235,0.32) 30deg, rgba(37,99,235,0.32) 90deg, transparent 120deg, transparent 360deg); border-radius: 50%; }
+  .user-marker .um-dot { position: absolute; left: 50%; top: 50%; width: 26px; height: 26px; margin-left: -13px; margin-top: -13px; border-radius: 50%; background: var(--blue); border: 3.5px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.4); }
+  .user-marker .um-pulse { position: absolute; left: 50%; top: 50%; width: 26px; height: 26px; margin-left: -13px; margin-top: -13px; border-radius: 50%; border: 2px solid var(--blue); animation: umPulse 2s ease-out infinite; }
+  @keyframes umPulse { 0% { transform: scale(0.8); opacity: 0.8; } 100% { transform: scale(3); opacity: 0; } }
+
+  .recenter { position: absolute; right: 14px; bottom: 16px; z-index: 35; width: 44px; height: 44px; border-radius: 50%; background: #fff; border: 1px solid var(--line-2); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 3px 10px rgba(0,0,0,0.15); cursor: pointer; }
+  .compass { position: absolute; right: 14px; top: 130px; z-index: 35; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.92); border: 1px solid var(--line-2); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.12); font-size: 0.85rem; font-weight: 700; color: var(--red); }
+  .floor-pill { position: absolute; left: 14px; top: 130px; z-index: 35; background: rgba(255,255,255,0.95); border: 1px solid var(--line-2); border-radius: 12px; padding: 7px 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); text-align: center; }
+  .floor-pill .fp-v { font-family: 'Archivo'; font-size: 1rem; font-weight: 800; color: var(--orange-deep); line-height: 1; }
+  .floor-pill .fp-l { font-size: 0.54rem; color: var(--text-dim); margin-top: 2px; }
+
+  .nav-sheet { background: var(--surface); border-radius: 22px 22px 0 0; padding: 16px 20px 20px; position: relative; z-index: 40; box-shadow: 0 -6px 24px rgba(0,0,0,0.18); flex-shrink: 0; }
+  .nav-sheet .ns-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .nav-sheet .ns-ava { width: 42px; height: 42px; border-radius: 50%; background: var(--red); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.1rem; flex-shrink: 0; position: relative; }
+  .nav-sheet .ns-ava .vp { position: absolute; inset: -3px; border-radius: 50%; border: 2px solid var(--red); animation: umPulse 1.8s ease-out infinite; }
+  .nav-sheet .ns-info { flex: 1; }
+  .nav-sheet .ns-name { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+  .nav-sheet .ns-loc { font-size: 0.74rem; color: var(--text-dim); margin-top: 1px; }
+  .nav-sheet .ns-tag { background: var(--red); color: #fff; font-size: 0.6rem; font-weight: 700; padding: 4px 9px; border-radius: 100px; }
+  .nav-sheet .ns-eta { display: flex; gap: 10px; }
+  .nav-sheet .eta-cell { flex: 1; background: var(--surface-2); border-radius: 12px; padding: 10px; text-align: center; }
+  .nav-sheet .ec-v { font-family: 'Archivo'; font-size: 1.1rem; font-weight: 800; color: var(--text); }
+  .nav-sheet .ec-v.red { color: var(--red); }
+  .nav-sheet .ec-v.green { color: var(--green); }
+  .nav-sheet .ec-l { font-size: 0.6rem; color: var(--text-dim); margin-top: 2px; }
+
+  .arrived { position: absolute; inset: 0; background: rgba(22,163,74,0.96); z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; opacity: 0; pointer-events: none; transition: opacity 0.4s; }
+  .arrived.show { opacity: 1; }
+  .arrived .a-ic { font-size: 4rem; margin-bottom: 16px; }
+  .arrived .a-t { font-family: 'Archivo'; font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
+  .arrived .a-s { font-size: 0.9rem; opacity: 0.9; text-align: center; padding: 0 30px; line-height: 1.6; }
+
+  /* WATCH */
+  .watch { width: 240px; }
+  .watch-device { width: 204px; height: 244px; position: relative; margin: 0 auto; }
+  .watch-band-v { position: absolute; left: 70px; width: 64px; background: #2a2a2e; }
+  .watch-band-v.top { top: 0; height: 34px; border-radius: 10px 10px 0 0; }
+  .watch-band-v.bot { bottom: 0; height: 34px; border-radius: 0 0 10px 10px; }
+  .watch-crown { position: absolute; right: 6px; top: 90px; width: 6px; height: 32px; background: #36363a; border-radius: 3px; }
+  .watch-screen { position: absolute; top: 24px; left: 22px; width: 160px; height: 196px; background: var(--fp-paper); border-radius: 48px; box-shadow: 0 8px 28px rgba(0,0,0,0.35), 0 0 0 6px #1a1a1d; overflow: hidden; display: flex; flex-direction: column; position: relative; }
+  .w-map-vp { flex: 1; position: relative; overflow: hidden; background: var(--fp-paper); }
+  .w-canvas { position: absolute; top: 0; left: 0; width: 700px; height: 700px; will-change: transform; }
+  .w-canvas svg { display: block; width: 700px; height: 700px; }
+  .w-user { position: absolute; left: 50%; top: 56%; z-index: 30; }
+  .w-user .wu-dot { position: absolute; left: 50%; top: 50%; width: 18px; height: 18px; margin-left: -9px; margin-top: -9px; border-radius: 50%; background: var(--blue); border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+  .w-user .wu-cone { position: absolute; left: 50%; top: 50%; width: 58px; height: 58px; margin-left: -29px; margin-top: -29px; background: conic-gradient(from -30deg at 50% 50%, transparent 0deg, rgba(37,99,235,0.4) 30deg, rgba(37,99,235,0.4) 90deg, transparent 120deg); border-radius: 50%; }
+  .w-arrow-float { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 40; width: 44px; height: 44px; border-radius: 12px; background: var(--orange-deep); display: flex; align-items: center; justify-content: center; color: #fff; box-shadow: 0 4px 12px rgba(255,77,0,0.5); }
+  .w-arrow-float .big { font-size: 1.7rem; font-family: 'Archivo'; font-weight: 900; }
+  .w-dist-bar { position: absolute; bottom: 0; left: 0; right: 0; z-index: 40; background: rgba(255,77,0,0.95); padding: 8px; text-align: center; }
+  .w-dist-bar .wd-v { font-family: 'Archivo'; font-size: 1.15rem; font-weight: 800; color: #fff; line-height: 1; }
+  .w-dist-bar .wd-l { font-size: 0.52rem; color: rgba(255,255,255,0.9); margin-top: 1px; }
+  .haptic-ring { position: absolute; inset: -4px; border-radius: 50px; border: 3px solid var(--orange-deep); opacity: 0; animation: haptic 2.5s ease-out infinite; z-index: 50; pointer-events: none; }
+  @keyframes haptic { 0% { opacity: 0; transform: scale(1); } 10% { opacity: 0.6; } 40% { opacity: 0; transform: scale(1.05); } 100% { opacity: 0; } }
+  .watch-cap2 { text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 0.64rem; color: #888; margin-top: 14px; font-weight: 600; }
+
+  .footer-note { max-width: 820px; margin: 44px auto 0; text-align: center; color: #888; font-size: 0.88rem; line-height: 1.7; }
+  .footer-note strong { color: #444; }
+  .footer-note .term { display: inline-block; background: var(--orange-soft); color: var(--orange-deep); font-family: 'IBM Plex Mono'; font-size: 0.82rem; font-weight: 600; padding: 2px 9px; border-radius: 5px; margin: 0 2px; }
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <h1><span class="accent">Rescue Routing</span> — 건축 평면도 도보 내비</h1>
+  <p>설계도를 받았다고 가정한 버전이야. 방·벽·복도·문·계단을 평면도처럼 상세하게 그리고,<br>그 위에서 현관부터 사고 발생 방까지 복도를 따라 안내해. 사용자가 움직이면 지도가 따라 회전·이동.</p>
+</div>
+
+<div class="controls">
+  <button class="ctrl-btn" id="playBtn">▶ 출동 시작 (걸어가기)</button>
+  <button class="ctrl-btn sec" id="resetBtn">↺ 처음으로</button>
+  <span class="ctrl-hint">현관에서 사고 발생 방까지 이동을 시뮬레이션</span>
+</div>
+
+<div class="stage">
+
+  <!-- PHONE -->
+  <div class="device-col">
+    <div class="device-cap">휴대폰 — 평면도 도보 내비</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar"><span>9:42</span><span class="icons">●●● ⌃ 🔋</span></div>
+
+        <div class="nav-bar">
+          <div class="nb-arrow"><span class="big" id="navArrow">↑</span></div>
+          <div class="nb-txt">
+            <div class="nb-dist"><span id="navDist">6</span><span class="u">m</span></div>
+            <div class="nb-inst" id="navInst">복도 따라 직진</div>
+          </div>
+        </div>
+
+        <div class="map-vp" id="mapVp">
+          <div class="map-canvas" id="mapCanvas">
+            <!-- 건축 평면도 (주택 floor plan 스타일) -->
+            <svg viewBox="0 0 1400 1400" id="mapSvg">
+              <defs>
+                <pattern id="fpgrid" width="50" height="50" patternUnits="userSpaceOnUse">
+                  <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#efece2" stroke-width="1"/>
+                </pattern>
+              </defs>
+              <rect x="0" y="0" width="1400" height="1400" fill="#fcfbf7"/>
+              <rect x="0" y="0" width="1400" height="1400" fill="url(#fpgrid)"/>
+
+              <!-- ===== 외벽 (두꺼운 벽) ===== -->
+              <!-- 전체 집 윤곽: 좌상(300,300) ~ 우하(1100,1100) -->
+              <g fill="#f3f1ea">
+                <rect x="300" y="300" width="800" height="800"/>
+              </g>
+
+              <!-- ===== 방 채우기 (room fills) ===== -->
+              <!-- 거실 (좌하, 큰 방) -->
+              <rect x="312" y="720" width="370" height="368" fill="#f3f1ea"/>
+              <!-- 주방 (우하) -->
+              <rect x="700" y="850" width="388" height="238" fill="#eeebe1"/>
+              <!-- 식당 (우하 상단) -->
+              <rect x="700" y="720" width="388" height="115" fill="#f3f1ea"/>
+              <!-- 침실1 (좌상) -->
+              <rect x="312" y="312" width="300" height="250" fill="#f3f1ea"/>
+              <!-- 침실2 (중상) -->
+              <rect x="630" y="312" width="260" height="250" fill="#f3f1ea"/>
+              <!-- 욕실 (우상) -->
+              <rect x="908" y="312" width="180" height="160" fill="#eaf0f4"/>
+              <!-- 드레스룸 (우상 하단) -->
+              <rect x="908" y="490" width="180" height="100" fill="#f3f1ea"/>
+              <!-- 사고 발생 방: 침실3/서재 (좌중) -->
+              <rect x="312" y="600" width="280" height="100" fill="#fde0d6"/>
+
+              <!-- ===== 복도 (corridor) ===== -->
+              <!-- 가로 중앙 복도 -->
+              <rect x="312" y="580" width="596" height="60" fill="#e4f0f4"/>
+              <!-- 세로 복도 (현관→중앙) -->
+              <rect x="620" y="600" width="70" height="500" fill="#e4f0f4"/>
+
+              <!-- ===== 내벽 (구획 벽, 굵게) ===== -->
+              <g stroke="#2b2b2e" stroke-width="7" stroke-linecap="square" fill="none">
+                <!-- 외벽 -->
+                <rect x="300" y="300" width="800" height="800"/>
+              </g>
+              <g stroke="#2b2b2e" stroke-width="5" stroke-linecap="square" fill="none">
+                <!-- 침실1 / 침실2 구분 -->
+                <line x1="612" y1="312" x2="612" y2="562"/>
+                <!-- 상단방들 / 복도 구분 -->
+                <line x1="300" y1="562" x2="908" y2="562"/>
+                <!-- 침실2 / 욕실·드레스룸 구분 -->
+                <line x1="890" y1="312" x2="890" y2="590"/>
+                <!-- 욕실 / 드레스룸 -->
+                <line x1="890" y1="478" x2="1100" y2="478"/>
+                <!-- 복도 하단 경계 (좌측 방들) -->
+                <line x1="300" y1="640" x2="620" y2="640"/>
+                <!-- 사고방 / 거실 구분 -->
+                <line x1="300" y1="700" x2="620" y2="700"/>
+                <!-- 세로복도 좌측벽 -->
+                <line x1="620" y1="640" x2="620" y2="1100"/>
+                <!-- 세로복도 우측벽 -->
+                <line x1="690" y1="640" x2="690" y2="1100"/>
+                <!-- 식당 / 주방 구분 -->
+                <line x1="690" y1="835" x2="1100" y2="835"/>
+                <!-- 거실 우측은 세로복도 -->
+              </g>
+
+              <!-- ===== 계단 (우하단 또는 복도 끝) ===== -->
+              <!-- 세로복도 끝(하단)에 계단실 -->
+              <g>
+                <rect x="620" y="980" width="70" height="120" fill="#f3f1ea" stroke="#ff6a1f" stroke-width="4"/>
+                <g stroke="#ff8a4d" stroke-width="2" fill="none">
+                  <line x1="628" y1="996" x2="682" y2="996"/>
+                  <line x1="628" y1="1012" x2="682" y2="1012"/>
+                  <line x1="628" y1="1028" x2="682" y2="1028"/>
+                  <line x1="628" y1="1044" x2="682" y2="1044"/>
+                  <line x1="628" y1="1060" x2="682" y2="1060"/>
+                  <line x1="628" y1="1076" x2="682" y2="1076"/>
+                  <path d="M655 1078 L655 990 M645 1004 L655 990 L665 1004" stroke="#ff6a1f" stroke-width="2.5"/>
+                </g>
+              </g>
+
+              <!-- ===== 문 (개구부 + 호 arc) ===== -->
+              <g stroke="#2b2b2e" stroke-width="2" fill="none">
+                <!-- 침실1 → 복도 -->
+                <path d="M 480 562 A 44 44 0 0 1 524 606" />
+                <!-- 침실2 → 복도 -->
+                <path d="M 740 562 A 44 44 0 0 1 784 606" />
+                <!-- 사고방 → 복도 -->
+                <path d="M 540 640 A 40 40 0 0 1 500 600" />
+                <!-- 욕실 문 -->
+                <path d="M 950 562 A 38 38 0 0 1 988 524" />
+                <!-- 거실 → 세로복도 -->
+                <path d="M 620 800 A 44 44 0 0 0 664 844" />
+                <!-- 주방 → 세로복도 -->
+                <path d="M 690 900 A 44 44 0 0 1 734 944" />
+                <!-- 현관문 (하단) -->
+                <path d="M 624 1100 A 42 42 0 0 1 666 1058" />
+              </g>
+              <!-- 문 개구부 (벽 끊김, 흰색) -->
+              <g fill="#fcfbf7">
+                <rect x="478" y="558" width="46" height="9"/>
+                <rect x="738" y="558" width="46" height="9"/>
+                <rect x="500" y="636" width="44" height="9"/>
+                <rect x="948" y="558" width="40" height="9"/>
+                <rect x="616" y="800" width="9" height="46"/>
+                <rect x="686" y="900" width="9" height="46"/>
+                <rect x="620" y="1096" width="46" height="9"/>
+              </g>
+
+              <!-- ===== 방 이름 ===== -->
+              <g fill="#8a8578" font-family="'IBM Plex Sans KR'" font-weight="600" text-anchor="middle">
+                <text x="460" y="440" font-size="22">침실 1</text>
+                <text x="760" y="440" font-size="22">침실 2</text>
+                <text x="998" y="400" font-size="16">욕실</text>
+                <text x="998" y="544" font-size="14">드레스룸</text>
+                <text x="497" y="828" font-size="24">거실</text>
+                <text x="894" y="790" font-size="18">식당</text>
+                <text x="894" y="975" font-size="20">주방</text>
+                <text x="655" y="1045" font-size="11" fill="#ff7a2a" font-weight="700">계단</text>
+              </g>
+              <!-- 복도 라벨 -->
+              <text x="420" y="616" fill="#8ab0bc" font-family="'IBM Plex Sans KR'" font-size="13" font-weight="600" text-anchor="middle">복도</text>
+              <!-- 사고 방 라벨 -->
+              <text x="452" y="655" fill="#d4430f" font-family="'IBM Plex Sans KR'" font-size="17" font-weight="700" text-anchor="middle">서재</text>
+              <!-- 현관 라벨 -->
+              <text x="655" y="1130" fill="#8a8578" font-family="'IBM Plex Sans KR'" font-size="14" font-weight="600" text-anchor="middle">현관</text>
+
+              <!-- 치수선 -->
+              <g stroke="#c8c3b4" stroke-width="1">
+                <line x1="300" y1="1160" x2="1100" y2="1160"/>
+                <line x1="300" y1="1154" x2="300" y2="1166"/>
+                <line x1="1100" y1="1154" x2="1100" y2="1166"/>
+              </g>
+              <text x="700" y="1180" fill="#a89888" font-family="monospace" font-size="13" text-anchor="middle">16.0 m</text>
+
+              <!-- ===== 경로 ===== -->
+              <!-- 현관(655,1100) → 세로복도 → 가로복도 → 서재(사고방) -->
+              <path id="routeCasing" d="M 655 1090 L 655 610 L 500 610 L 452 660" fill="none" stroke="#ff4d00" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" opacity="0.2"/>
+              <path id="routeDone" d="" fill="none" stroke="#c4b0a0" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+              <path id="routeLive" d="M 655 1090 L 655 610 L 500 610 L 452 660" fill="none" stroke="#ff4d00" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+
+              <!-- 방향 화살표 -->
+              <g fill="#fff" font-family="Archivo" font-weight="900">
+                <text x="655" y="900" font-size="20" text-anchor="middle">↑</text>
+                <text x="655" y="720" font-size="20" text-anchor="middle">↑</text>
+                <text x="570" y="602" font-size="20" text-anchor="middle">←</text>
+              </g>
+
+              <!-- 사고자 마커 (서재) -->
+              <g>
+                <circle cx="452" cy="660" r="38" fill="#ff1f1f" opacity="0.15"/>
+                <circle cx="452" cy="660" r="22" fill="#ff1f1f" opacity="0.3"/>
+                <path d="M452 634 a17 17 0 0 1 17 17 c0 11 -17 28 -17 28 c0 0 -17 -17 -17 -28 a17 17 0 0 1 17 -17" fill="#ff1f1f" stroke="#fff" stroke-width="2.5"/>
+                <circle cx="452" cy="651" r="6" fill="#fff"/>
+              </g>
+            </svg>
+          </div>
+
+          <div class="user-marker" id="userMarker">
+            <div class="um-cone"></div>
+            <div class="um-pulse"></div>
+            <div class="um-dot"></div>
+          </div>
+
+          <div class="floor-pill"><div class="fp-v">1F</div><div class="fp-l">현재 층</div></div>
+          <div class="compass" id="needle">↑N</div>
+          <div class="recenter" id="recenterBtn">📍</div>
+
+          <div class="arrived" id="arrived">
+            <div class="a-ic">✓</div>
+            <div class="a-t">현장 도착</div>
+            <div class="a-s">박작업님 위치(서재)에 도착했어요.<br>상태 확인 후 응급 대응하세요.</div>
+          </div>
+        </div>
+
+        <div class="nav-sheet">
+          <div class="ns-top">
+            <div class="ns-ava"><span class="vp"></span>🆘</div>
+            <div class="ns-info">
+              <div class="ns-name">박작업님께 가는 중</div>
+              <div class="ns-loc">서재 · 1층</div>
+            </div>
+            <div class="ns-tag">쓰러짐</div>
+          </div>
+          <div class="ns-eta">
+            <div class="eta-cell"><div class="ec-v" id="etaDist">22m</div><div class="ec-l">남은 거리</div></div>
+            <div class="eta-cell"><div class="ec-v green" id="etaTime">0:25</div><div class="ec-l">도착 예상</div></div>
+            <div class="eta-cell"><div class="ec-v">1F</div><div class="ec-l">층</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WATCH -->
+  <div class="device-col">
+    <div class="device-cap">워치 — 지도 + 화살표만</div>
+    <div class="watch">
+      <div class="watch-device">
+        <div class="watch-band-v top"></div>
+        <div class="watch-band-v bot"></div>
+        <div class="watch-crown"></div>
+        <div class="watch-screen">
+          <div class="haptic-ring"></div>
+          <div class="w-arrow-float"><span class="big" id="wArrow">↑</span></div>
+          <div class="w-map-vp" id="wMapVp">
+            <div class="w-canvas" id="wCanvas">
+              <svg viewBox="0 0 700 700">
+                <rect x="0" y="0" width="700" height="700" fill="#fcfbf7"/>
+                <!-- 평면도 단순화: 외벽 -->
+                <rect x="150" y="150" width="400" height="400" fill="#f3f1ea" stroke="#2b2b2e" stroke-width="5"/>
+                <!-- 방 구획 -->
+                <g stroke="#2b2b2e" stroke-width="3.5" fill="none">
+                  <line x1="150" y1="300" x2="450" y2="300"/>
+                  <line x1="330" y1="150" x2="330" y2="300"/>
+                  <line x1="150" y1="360" x2="320" y2="360"/>
+                  <line x1="320" y1="330" x2="320" y2="550"/>
+                  <line x1="370" y1="330" x2="370" y2="550"/>
+                </g>
+                <!-- 복도 -->
+                <rect x="150" y="305" width="300" height="50" fill="#e4f0f4"/>
+                <rect x="320" y="330" width="50" height="220" fill="#e4f0f4"/>
+                <!-- 사고방 (서재) -->
+                <rect x="152" y="362" width="166" height="80" fill="#fde0d6"/>
+                <!-- 계단 -->
+                <rect x="320" y="490" width="50" height="60" fill="#f3f1ea" stroke="#ff6a1f" stroke-width="3"/>
+                <g stroke="#ff8a4d" stroke-width="1.5" fill="none">
+                  <line x1="326" y1="500" x2="364" y2="500"/><line x1="326" y1="512" x2="364" y2="512"/>
+                  <line x1="326" y1="524" x2="364" y2="524"/><line x1="326" y1="536" x2="364" y2="536"/>
+                </g>
+
+                <!-- 경로 -->
+                <path id="wRouteDone" d="" fill="none" stroke="#c4b0a0" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"/>
+                <path id="wRouteLive" d="M 345 540 L 345 330 L 250 330 L 235 400" fill="none" stroke="#ff4d00" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+                <!-- 사고자 -->
+                <g>
+                  <circle cx="235" cy="400" r="20" fill="#ff1f1f" opacity="0.2"/>
+                  <path d="M235 380 a14 14 0 0 1 14 14 c0 9 -14 22 -14 22 c0 0 -14 -13 -14 -22 a14 14 0 0 1 14 -14" fill="#ff1f1f" stroke="#fff" stroke-width="2"/>
+                </g>
+              </svg>
+            </div>
+            <div class="w-user" id="wUser">
+              <div class="wu-cone"></div>
+              <div class="wu-dot"></div>
+            </div>
+          </div>
+          <div class="w-dist-bar"><div class="wd-v"><span id="wDist">6</span>m</div><div class="wd-l">복도 직진</div></div>
+        </div>
+      </div>
+      <div class="watch-cap2">지도 회전 + 화살표 · 진동</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer-note">
+  <span class="term">Rescue Routing</span> — 설계도(건축 평면도)를 받았다고 가정: <strong>방·내벽·복도·문(개구부와 호)·계단</strong>을 상세하게 표현.<br>
+  경로는 <strong>방을 통과하지 않고 복도를 따라</strong> 안내(현관 → 세로복도 → 가로복도 → 서재). 사용자가 움직이면 지도가 회전·이동, 내 마커는 화면 고정.<br>
+  실제 앱에서는 이 주택 평면도 자리에 <strong>조선소 블록 도면</strong>을 넣으면 그대로 작동해.
+</div>
+
+<script>
+(function() {
+  // ===== 경로 (mapSvg 1400 좌표계) — 현관에서 서재까지, 복도를 따라 =====
+  const path = [
+    {x:655, y:1090, arrow:'↑', inst:'현관에서 출발'},
+    {x:655, y:610,  arrow:'←', inst:'복도 따라 직진'},
+    {x:500, y:610,  arrow:'←', inst:'가로 복도로 좌회전'},
+    {x:452, y:660,  arrow:'✓', inst:'서재 도착'},
+  ];
+  const wPath = [
+    {x:345, y:540},{x:345, y:330},{x:250, y:330},{x:235, y:400}
+  ];
+
+  const TOTAL_M = 22;
+  const TOTAL_SEC = 25;
+
+  function lens(pts){let s=[],tot=0;for(let i=0;i<pts.length-1;i++){const l=Math.hypot(pts[i+1].x-pts[i].x,pts[i+1].y-pts[i].y);s.push(l);tot+=l;}return{s,tot};}
+  const P=lens(path), WP=lens(wPath);
+
+  function ptAt(pts,S,tot,tt){
+    let d=tt*tot,i=0;
+    while(i<S.length&&d>S[i]){d-=S[i];i++;}
+    if(i>=S.length){const last=pts[pts.length-1];return{x:last.x,y:last.y,seg:S.length-1,arrow:last.arrow,inst:last.inst};}
+    const a=pts[i],b=pts[i+1],f=S[i]?d/S[i]:0;
+    return{x:a.x+(b.x-a.x)*f,y:a.y+(b.y-a.y)*f,seg:i,arrow:a.arrow,inst:a.inst,nx:b.x,ny:b.y};
+  }
+  function buildD(pts){return pts.length?'M '+pts.map(p=>`${p.x} ${p.y}`).join(' L '):'';}
+
+  const mapVp=document.getElementById('mapVp');
+  const mapCanvas=document.getElementById('mapCanvas');
+  const wMapVp=document.getElementById('wMapVp');
+  const wCanvas=document.getElementById('wCanvas');
+  const routeDone=document.getElementById('routeDone');
+  const routeLive=document.getElementById('routeLive');
+  const wRouteDone=document.getElementById('wRouteDone');
+  const wRouteLive=document.getElementById('wRouteLive');
+  const navArrow=document.getElementById('navArrow');
+  const navDist=document.getElementById('navDist');
+  const navInst=document.getElementById('navInst');
+  const etaDist=document.getElementById('etaDist');
+  const etaTime=document.getElementById('etaTime');
+  const wArrow=document.getElementById('wArrow');
+  const wDist=document.getElementById('wDist');
+  const needle=document.getElementById('needle');
+  const arrived=document.getElementById('arrived');
+
+  const MAP_SCALE=1.05, W_SCALE=1.0, ROTATE=true;
+
+  function heading(p){if(p.nx===undefined)return 0;const dx=p.nx-p.x,dy=p.ny-p.y;if(dx===0&&dy===0)return 0;return Math.atan2(dy,dx)*180/Math.PI+90;}
+
+  function update(tt){
+    const p=ptAt(path,P.s,P.tot,tt);
+    const ang=ROTATE?heading(p):0;
+
+    const vpW=mapVp.clientWidth||348, vpH=mapVp.clientHeight||560;
+    const mx=vpW*0.5, my=vpH*0.58;
+    mapCanvas.style.transformOrigin=`${p.x}px ${p.y}px`;
+    mapCanvas.style.transform=`translate(${mx-p.x}px, ${my-p.y}px) rotate(${-ang}deg) scale(${MAP_SCALE})`;
+
+    const done=[];for(let i=0;i<=p.seg;i++)done.push(path[i]);done.push({x:p.x,y:p.y});
+    routeDone.setAttribute('d',buildD(done));
+    const live=[{x:p.x,y:p.y}];for(let i=p.seg+1;i<path.length;i++)live.push(path[i]);
+    routeLive.setAttribute('d',buildD(live));
+
+    const wp=ptAt(wPath,WP.s,WP.tot,tt);
+    const wvpW=wMapVp.clientWidth||160, wvpH=wMapVp.clientHeight||196;
+    const wmx=wvpW*0.5, wmy=wvpH*0.56;
+    wCanvas.style.transformOrigin=`${wp.x}px ${wp.y}px`;
+    wCanvas.style.transform=`translate(${wmx-wp.x}px, ${wmy-wp.y}px) rotate(${-ang}deg) scale(${W_SCALE})`;
+    const wSeg=Math.min(Math.floor(tt*(wPath.length-1)),wPath.length-2);
+    const wdone=[];for(let i=0;i<=wSeg;i++)wdone.push(wPath[i]);wdone.push({x:wp.x,y:wp.y});
+    wRouteDone.setAttribute('d',buildD(wdone));
+    const wlive=[{x:wp.x,y:wp.y}];for(let i=wSeg+1;i<wPath.length;i++)wlive.push(wPath[i]);
+    wRouteLive.setAttribute('d',buildD(wlive));
+
+    const remain=Math.max(0,Math.round((1-tt)*TOTAL_M));
+    const nextTurnFrac=(p.seg+1)/(path.length-1);
+    const distTurn=Math.max(1,Math.round((nextTurnFrac-tt)*TOTAL_M));
+    navArrow.textContent=p.arrow; wArrow.textContent=p.arrow;
+    navDist.textContent=distTurn; wDist.textContent=distTurn;
+    navInst.textContent=p.inst;
+    etaDist.textContent=remain+'m';
+    const sec=Math.max(0,Math.round((1-tt)*TOTAL_SEC));
+    etaTime.textContent=Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');
+    needle.style.transform=`rotate(${ang}deg)`;
+
+    if(tt>=1)arrived.classList.add('show');else arrived.classList.remove('show');
+  }
+
+  let anim=null,t=0;
+  function play(){if(anim)cancelAnimationFrame(anim);if(t>=1)t=0;const dur=11000;const start=performance.now()-t*dur;function frame(now){t=Math.min((now-start)/dur,1);update(t);if(t<1)anim=requestAnimationFrame(frame);}anim=requestAnimationFrame(frame);}
+  function reset(){if(anim)cancelAnimationFrame(anim);t=0;update(0);arrived.classList.remove('show');}
+
+  document.getElementById('playBtn').addEventListener('click',play);
+  document.getElementById('resetBtn').addEventListener('click',reset);
+  document.getElementById('recenterBtn').addEventListener('click',()=>update(t));
+
+  function init(){update(0);}
+  if(document.readyState!=='loading'){setTimeout(init,50);}
+  window.addEventListener('load',()=>setTimeout(init,50));
+})();
+</script>
+
+</body>
+</html>
